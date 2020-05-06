@@ -9,7 +9,6 @@
 #' @param priors list of scale priors for beta, lv, and lf
 #' @param posterior type of posterior distribution
 #' @param iter number of optimization steps
-#' @param step_size batch_size
 #' @param lr learning_rate, can be also a list (for each parameter type)
 #' @param device which device to be used, "cpu" or "gpu"
 #' @param dtype which data type, most GPUs support only 32 bit floats.
@@ -31,8 +30,8 @@
 #' @author Maximilian Pichler
 #' @export
 sLVM = function(Y = NULL, X = NULL, formula = NULL, lv = 2L, family,
-                priors = list(3.0, 1.0, 1.0), posterior = c("DiagonalNormal", "LaplaceApproximation", "LowRankMultivariateNormal", "Delta"),
-                iter = 50L, step_size=20L, lr=list(0.1), device = "cpu", dtype = "float32") {
+                priors = list(1.0, 1.0, 1.0), posterior = c("DiagonalNormal", "LaplaceApproximation", "LowRankMultivariateNormal", "Delta"),
+                iter = 50L, lr=list(0.1), device = "cpu", dtype = "float32") {
   
   check_module()
   
@@ -90,7 +89,7 @@ sLVM = function(Y = NULL, X = NULL, formula = NULL, lv = 2L, family,
   
   if(!inherits(X, "matrix")) X = matrix(X, ncol=1L)
   
-  time = system.time({model$fit(X, Y, lr =lr, batch_size = as.integer(step_size), epochs = as.integer(iter), parallel = 0L)})[3]
+  time = system.time({model$fit(X, Y, lr =lr, epochs = as.integer(iter), parallel = 0L)})[3]
   out$model = model
   out$data = list(X = X, Y = Y)
   out$formula = formula
@@ -110,16 +109,6 @@ sLVM = function(Y = NULL, X = NULL, formula = NULL, lv = 2L, family,
   class(out) = "sLVM"
   return(out)
 }
-# com = simulate_SDM(env = 3L, species = 5L, sites = 400L)
-# 
-# m = sLVM(com$response, com$env_weights,
-#          family = binomial("probit"), formula = ~0+.,posterior = "DiagonalNormal", lr = list(0.03), iter=100L, priors = list(2.0,1.0,1.0))
-# plot(density(m$posterior_samples$mu[,3,2]))
-# abline(v = quantile(m$posterior_samples$mu[,3,2], probs = c(0.025, 0.975)))
-# abline(v = mean((m$posterior_samples$mu[,3,2])), col="red")
-# abline(v = median((m$posterior_samples$mu[,3,2])), col="red")
-
-
 
 
 
@@ -252,7 +241,7 @@ summary.sLVM = function(object, ...) {
     lc = parse(round(as.vector(CIs[1,,]),3))
     hc = parse(round(as.vector(CIs[2,,]),3))
     s = ifelse(within,"*"," " )
-    cols = c(" ", "Estimate(mean)", "Lower CI", "Higher CI", "")
+    cols = c(" ", "Estimate(mean)", "Lower CI", "Upper CI", "")
     
     
     lambda = function(x)gsub("\\s", " ", format(x, width=max(nchar(sp_env), nchar(cols))))

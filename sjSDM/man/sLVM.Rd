@@ -5,9 +5,9 @@
 \title{sLVM}
 \usage{
 sLVM(Y = NULL, X = NULL, formula = NULL, lv = 2L, family,
-  priors = list(3, 1, 1), posterior = c("DiagonalNormal",
+  priors = list(1, 1, 1), posterior = c("DiagonalNormal",
   "LaplaceApproximation", "LowRankMultivariateNormal", "Delta"), iter = 50L,
-  step_size = 20L, lr = list(0.1), device = "cpu", dtype = "float32")
+  lr = list(0.1), device = "cpu", dtype = "float32")
 }
 \arguments{
 \item{Y}{species occurrences}
@@ -25,8 +25,6 @@ sLVM(Y = NULL, X = NULL, formula = NULL, lv = 2L, family,
 \item{posterior}{type of posterior distribution}
 
 \item{iter}{number of optimization steps}
-
-\item{step_size}{batch_size}
 
 \item{lr}{learning_rate, can be also a list (for each parameter type)}
 
