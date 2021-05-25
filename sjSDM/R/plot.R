@@ -7,7 +7,6 @@
 #' @param col Define colors for groups, default is NULL.
 #' 
 #' @example /inst/examples/Coeffect_plot-emample.R
-#' @import tidyverse
 #
 #' @author CAI Wang
 #' @export
@@ -20,7 +19,7 @@ plotsjSDMcoef = function(object,wrap_col,group=NULL,col=NULL) {
   library(tidyverse)
   effect = data.frame( Estimate=summary.se$coefmat[,1],Std.Err=summary.se$coefmat[,2],P=summary.se$coefmat[,4],rownames=rownames(summary.se$coefmat))
   
-  effect= effect %>% separate(col = rownames, into = c("species", "coef"), sep = " ") %>% filter(coef != "(Intercept)") %>% mutate(coef=as.factor(coef),star=NA)
+  effect= effect %>% tidyr::separate(col = rownames, into = c("species", "coef"), sep = " ") %>% dplyr::filter(coef != "(Intercept)") %>% dplyr::mutate(coef=as.factor(coef),star=NA)
   for (i in 1:length(effect$P)) {
     if(effect$P[i]<0.001){effect$p[i]="***"}
     else if (0.001<effect$P[i] & effect$P[i]<0.01){effect$star[i]="**"}
@@ -30,8 +29,8 @@ plotsjSDMcoef = function(object,wrap_col,group=NULL,col=NULL) {
   }
   
   if(is.null(group)) group=NULL
-  else {effect=left_join(effect,data.frame(group),by="species") 
-  group= arrange(group,group)
+  else {effect=dplyr::left_join(effect,data.frame(group),by="species") 
+  group= dplyr::arrange(group,group)
   effect$species=factor(effect$species,levels= group$species)
   }
   if(is.null(col))  
