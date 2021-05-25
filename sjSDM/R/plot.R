@@ -254,3 +254,61 @@ plotAssociations = function(sigma, radius = 5.0, main = NULL,
   controlCircular$n = n
   return(invisible(controlCircular))
 }
+
+
+#' Coeffect plot
+#' 
+#' importance of abiotic, biotic, and spatial effects
+#' 
+#' @param object a model fitted by \code{\link{sjSDM}} 
+#' @param env matrix of environmental predictors, object of type \code{\link{linear}} or \code{\link{DNN}}
+#' @param group Define the taxonomic characteristics of a species, you need to provide a dataframe with a column for the name of the species and a column for the attributes, default is NULL. For example, Group [1,1]== "sp1", group[1,2]== "Mammal".
+#' @param col Define colors for groups, default is NULL.
+#' 
+#' @example /inst/examples/Coeffect_plot-emample.R
+#' @author CAI Wang
+#' @export 
+
+plot.sjSDMcoef <- function(object,wrap_col,group=NULL,col=NULL) {
+  
+  if(is.null(object$se)) summary.se=summary(getSe(object))
+  else summary.se=summary(object)
+  
+  #create dataset for plot 
+  library(tidyverse)
+  effect = data.frame( Estimate=summary.se$coefmat[,1],Std.Err=summary.se$coefmat[,2],P=summary.se$coefmat[,4],rownames=rownames(summary.se$coefmat))
+  
+  effect= effect %>% separate(col = rownames, into = c("species", "coef"), sep = " ") %>% filter(coef != "(Intercept)") %>% mutate(coef=as.factor(coef),star=NA)
+  for (i in 1:length(effect$P)) {
+    if(effect$P[i]<0.001){effect$p[i]="***"}
+    else if (0.001<effect$P[i] & effect$P[i]<0.01){effect$star[i]="**"}
+    else if (0.01<effect$P[i] & effect$P[i]<0.05){effect$star[i]="*"}
+    else if (0.05<effect$P[i] & effect$P[i]<0.1){effect$star[i]="."}
+    else {effect$star[i]=""}
+  }
+  
+  if(is.null(group)) group=NULL
+  else {effect=left_join(effect,data.frame(group),by="species") 
+  group= arrange(group,group)
+  effect$species=factor(effect$species,levels= group$species)
+  }
+  if(is.null(col))  
+    col <- RColorBrewer::brewer.pal(10, "Paired") 
+  else col=col
+  maxy=max(effect$Estimate+effect$Std.Err)
+  miny=min(effect$Estimate-effect$Std.Err)
+  
+  ggplot(effect,aes(x = species, y = Estimate, fill = group)) +
+    geom_bar(position = position_dodge(0.6), stat="identity", width = 0.5)+
+    scale_fill_manual(values=col)+
+    guides(fill = guide_legend(reverse=F))+
+    xlab("species") + 
+    ylab("coef") + 
+    labs(fill="Group Index") + 
+    coord_flip(expand=F) + 
+    geom_hline(aes(yintercept = 0),linetype="dashed",size=1) +
+    theme_classic()+ facet_wrap(~coef, ncol = wrap_col)+ 
+    geom_text(aes(y= miny-0.1, label = star), position = position_dodge(0.3), 
+              size = 2.5, fontface = "bold")+
+    geom_errorbar(aes(ymax = Estimate + Std.Err, ymin = Estimate - Std.Err), width = 0.3)+ scale_y_continuous(limits = c(miny-0.3,maxy+0.1))
+}
