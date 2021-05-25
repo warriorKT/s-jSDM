@@ -3,7 +3,6 @@
 #' plot the Coeffect return by sjSDM
 #' 
 #' @param object a model fitted by \code{\link{sjSDM}} 
-#' @param env matrix of environmental predictors, object of type \code{\link{linear}} or \code{\link{DNN}}
 #' @param group Define the taxonomic characteristics of a species, you need to provide a dataframe with a column for the name of the species and a column for the attributes, default is NULL. For example, Group [1,1]== "sp1", group[1,2]== "Mammal".
 #' @param col Define colors for groups, default is NULL.
 #' 
@@ -11,7 +10,7 @@
 #' @author CAI Wang
 #' @export 
 
-plot.sjSDMcoef = function(object,wrap_col,group=NULL,col=NULL) {
+plotcoef = function(object,wrap_col,group=NULL,col=NULL) {
   
   if(is.null(object$se)) summary.se=summary(getSe(object))
   else summary.se=summary(object)
