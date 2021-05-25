@@ -7,11 +7,8 @@
 #' @param col Define colors for groups, default is NULL.
 #' 
 #' @example /inst/examples/Coeffect_plot-emample.R
-#' @importFrom tidyverse separate
-#' @importFrom tidyverse filter
-#' @importFrom tidyverse mutate
-#' @importFrom tidyverse left_join
-#' @importFrom tidyverse arrange
+#' @import tidyverse
+#
 #' @author CAI Wang
 #' @export
 plotsjSDMcoef = function(object,wrap_col,group=NULL,col=NULL) {
