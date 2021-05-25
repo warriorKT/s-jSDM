@@ -1,6 +1,6 @@
 #' Coeffect plot
 #' 
-#' importance of abiotic, biotic, and spatial effects
+#' plot the Coeffect return by sjSDM
 #' 
 #' @param object a model fitted by \code{\link{sjSDM}} 
 #' @param env matrix of environmental predictors, object of type \code{\link{linear}} or \code{\link{DNN}}
