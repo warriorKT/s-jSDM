@@ -8,9 +8,8 @@
 #' 
 #' @example /inst/examples/Coeffect_plot-emample.R
 #' @author CAI Wang
-#' @export 
-
-plotcoef = function(object,wrap_col,group=NULL,col=NULL) {
+#' @export
+plotsjSDMcoef = function(object,wrap_col,group=NULL,col=NULL) {
   
   if(is.null(object$se)) summary.se=summary(getSe(object))
   else summary.se=summary(object)
@@ -53,6 +52,7 @@ plotcoef = function(object,wrap_col,group=NULL,col=NULL) {
               size = 2.5, fontface = "bold")+
     geom_errorbar(aes(ymax = Estimate + Std.Err, ymin = Estimate - Std.Err), width = 0.3)+ scale_y_continuous(limits = c(miny-0.3,maxy+0.1))
 }
+
 
 #' deg2rad
 #' degree to rad

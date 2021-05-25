@@ -1,11 +1,11 @@
-\name{plot.sjSDMcoef}
-\alias{plot.sjSDMcoef}
-\title{plot.sjSDMcoef}
+\name{plotsjSDMcoef}
+\alias{plotsjSDMcoef}
+\title{plotsjSDMcoef}
 \description{
 plot the Coeffect return by sjSDM
 }
 \usage{
-plot.sjSDMcoef(object, wrap_col, group = NULL, col = NULL)
+plotsjSDMcoef(object, wrap_col, group = NULL, col = NULL)
 }
 
 \arguments{
@@ -36,7 +36,7 @@ species=c("sp1","sp2","sp3","sp4","sp5","sp6","sp7")
 group=c("mammal","bird","fish","fish","mammal","amphibian","amphibian")
 group = data.frame(species=species,group=group)
 
-plot.sjSDMcoef(model,wrap_col=3,group=group)
+plotsjSDMcoef(model,wrap_col=3,group=group)
 }
 }
 
