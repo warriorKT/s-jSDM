@@ -3,6 +3,8 @@
 #' Plotting coeffects return by sjSDM model
 #' This function only for model fitted by linear, fitted by DNN is not yet supported.
 #' @import ggplot2
+#' @import tidyr
+#' @import dplyr 
 #' @importFrom magrittr `%>%`
 #' @param object a model fitted by \code{\link{sjSDM}} 
 #' @param wrap_col Scales argument passed to wrap_col
