@@ -16,7 +16,8 @@ plotsjSDMcoef(object, wrap_col = NULL, group = NULL, col = NULL)
 \item{col}{Define colors for groups, default is NULL.}
 }
 \description{
-plot Coeffects return by sjSDM model
+Plotting coeffects return by sjSDM model
+This function only for model fitted by linear, fitted by DNN is not yet supported.
 }
 \examples{
 \donttest{

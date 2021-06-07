@@ -1,11 +1,9 @@
 #' Coeffect plot
 #' 
-#' plot Coeffects return by sjSDM model
-#' 
+#' Plotting coeffects return by sjSDM model
+#' This function only for model fitted by linear, fitted by DNN is not yet supported.
 #' @import ggplot2
-#' @import magrittr 
-#' @import tidyr
-#' @import dplyr 
+#' @importFrom magrittr `%>%`
 #' @param object a model fitted by \code{\link{sjSDM}} 
 #' @param wrap_col Scales argument passed to wrap_col
 #' @param group Define the taxonomic characteristics of a species, you need to provide a dataframe with column1 named “species” and column2 named “group”, default is NULL. For example, group[1,1]== "sp1", group[1,2]== "Mammal".
@@ -21,12 +19,13 @@ plotsjSDMcoef = function(object,wrap_col=NULL,group=NULL,col=NULL) {
     inherits(model, "sjSDM"),
     inherits(model$settings$env, "linear")
   )
-  if(is.null(object$se)) summary.se=summary(getSe(object))
-  else summary.se=summary(object)
+  if(is.null(object$se)) object=getSe(object)
+  summary.se=summary(object)
   #create dataset for plot 
   effect = data.frame( Estimate=summary.se$coefmat[,1],Std.Err=summary.se$coefmat[,2],P=summary.se$coefmat[,4],rownames=rownames(summary.se$coefmat))
   
   effect= effect %>% tidyr::separate(col = rownames, into = c("species", "coef"), sep = " ") %>% dplyr::filter(coef != "(Intercept)") %>% dplyr::mutate(coef=as.factor(coef),star=NA)
+  
   effect$star <- stats::symnum(effect$P, corr = FALSE,
                                cutpoints = c(0, .001, .01, .05, .1, 1),
                                symbols = c("***","**","*","."," ")) 
@@ -39,8 +38,8 @@ plotsjSDMcoef = function(object,wrap_col=NULL,group=NULL,col=NULL) {
   }
   else {
     effect=dplyr::left_join(effect,data.frame(group),by="species")
-    if(anyNA(effect$group)) stop("There are no groups or NAs")
-    group= dplyr::arrange(group,group)
+    if(anyNA(effect$group)) stop("There are no groups or with NAs")
+    group= dplyr::arrange(group,desc(group))
     effect$species=factor(effect$species,levels= group$species)
   }
   if(is.null(col))  
@@ -56,7 +55,7 @@ plotsjSDMcoef = function(object,wrap_col=NULL,group=NULL,col=NULL) {
     guides(fill = guide_legend(reverse=F))+
     xlab("species") + 
     ylab("coef") + 
-    labs(fill="Group Index") + 
+    labs(fill="Group") + 
     coord_flip(expand=F) + 
     geom_hline(aes(yintercept = 0),linetype="dashed",size=1) +
     theme_classic()+ facet_wrap(~coef, ncol = wrap_col)+ 
