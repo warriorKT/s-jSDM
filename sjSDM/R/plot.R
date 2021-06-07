@@ -21,7 +21,7 @@ plotsjSDMcoef = function(object,wrap_col=NULL,group=NULL,col=NULL) {
     inherits(object, "sjSDM"),
     inherits(object$settings$env, "linear")
   )
-  effect=data.frame()
+  Estimate=NULL; Std.Err=NULL; coef=NULL; species=NULL; star=NULL
   if(is.null(object$se)) object=getSe(object)
   summary.se=summary(object)
   #create dataset for plot 
