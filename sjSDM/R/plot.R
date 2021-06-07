@@ -18,9 +18,10 @@
 
 plotsjSDMcoef = function(object,wrap_col=NULL,group=NULL,col=NULL) {
   stopifnot(
-    inherits(model, "sjSDM"),
-    inherits(model$settings$env, "linear")
+    inherits(object, "sjSDM"),
+    inherits(object$settings$env, "linear")
   )
+  effect=data.frame()
   if(is.null(object$se)) object=getSe(object)
   summary.se=summary(object)
   #create dataset for plot 
