@@ -4,17 +4,19 @@
 \alias{plotsjSDMcoef}
 \title{Coeffect plot}
 \usage{
-plotsjSDMcoef(object, wrap_col, group = NULL, col = NULL)
+plotsjSDMcoef(object, wrap_col = NULL, group = NULL, col = NULL)
 }
 \arguments{
 \item{object}{a model fitted by \code{\link{sjSDM}}}
 
-\item{group}{Define the taxonomic characteristics of a species, you need to provide a dataframe with a column for the name of the species and a column for the attributes, default is NULL. For example, Group [1,1]== "sp1", group[1,2]== "Mammal".}
+\item{wrap_col}{Scales argument passed to wrap_col}
+
+\item{group}{Define the taxonomic characteristics of a species, you need to provide a dataframe with column1 named “species” and column2 named “group”, default is NULL. For example, group[1,1]== "sp1", group[1,2]== "Mammal".}
 
 \item{col}{Define colors for groups, default is NULL.}
 }
 \description{
-plot the Coeffect return by sjSDM
+plot Coeffects return by sjSDM model
 }
 \examples{
 \donttest{

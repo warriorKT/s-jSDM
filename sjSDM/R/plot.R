@@ -1,45 +1,56 @@
 #' Coeffect plot
 #' 
-#' plot the Coeffect return by sjSDM
+#' plot Coeffects return by sjSDM model
 #' 
+#' @import ggplot2
+#' @import magrittr 
+#' @import tidyr
+#' @import dplyr 
 #' @param object a model fitted by \code{\link{sjSDM}} 
-#' @param group Define the taxonomic characteristics of a species, you need to provide a dataframe with a column for the name of the species and a column for the attributes, default is NULL. For example, Group [1,1]== "sp1", group[1,2]== "Mammal".
+#' @param wrap_col Scales argument passed to wrap_col
+#' @param group Define the taxonomic characteristics of a species, you need to provide a dataframe with column1 named “species” and column2 named “group”, default is NULL. For example, group[1,1]== "sp1", group[1,2]== "Mammal".
 #' @param col Define colors for groups, default is NULL.
-#' 
+
 #' @example /inst/examples/Coeffect_plot-emample.R
 #
 #' @author CAI Wang
 #' @export
-plotsjSDMcoef = function(object,wrap_col,group=NULL,col=NULL) {
-  
+
+plotsjSDMcoef = function(object,wrap_col=NULL,group=NULL,col=NULL) {
+  stopifnot(
+    inherits(model, "sjSDM"),
+    inherits(model$settings$env, "linear")
+  )
   if(is.null(object$se)) summary.se=summary(getSe(object))
   else summary.se=summary(object)
-  
   #create dataset for plot 
-  library(tidyverse)
   effect = data.frame( Estimate=summary.se$coefmat[,1],Std.Err=summary.se$coefmat[,2],P=summary.se$coefmat[,4],rownames=rownames(summary.se$coefmat))
   
   effect= effect %>% tidyr::separate(col = rownames, into = c("species", "coef"), sep = " ") %>% dplyr::filter(coef != "(Intercept)") %>% dplyr::mutate(coef=as.factor(coef),star=NA)
-  for (i in 1:length(effect$P)) {
-    if(effect$P[i]<0.001){effect$p[i]="***"}
-    else if (0.001<effect$P[i] & effect$P[i]<0.01){effect$star[i]="**"}
-    else if (0.01<effect$P[i] & effect$P[i]<0.05){effect$star[i]="*"}
-    else if (0.05<effect$P[i] & effect$P[i]<0.1){effect$star[i]="."}
-    else {effect$star[i]=""}
-  }
+  effect$star <- stats::symnum(effect$P, corr = FALSE,
+                               cutpoints = c(0, .001, .01, .05, .1, 1),
+                               symbols = c("***","**","*","."," ")) 
   
+ 
   if(is.null(group)) group=NULL
-  else {effect=dplyr::left_join(effect,data.frame(group),by="species") 
-  group= dplyr::arrange(group,group)
-  effect$species=factor(effect$species,levels= group$species)
+  else if ( (colnames(data.frame(group)) != c("species","group"))[1]=="TRUE" |(colnames(data.frame(group)) != c("species","group"))[2]=="TRUE") {
+    print ("group column's name should be 'species' and 'group'")
+    group=NULL
+  }
+  else {
+    effect=dplyr::left_join(effect,data.frame(group),by="species")
+    if(anyNA(effect$group)) stop("There are no groups or NAs")
+    group= dplyr::arrange(group,group)
+    effect$species=factor(effect$species,levels= group$species)
   }
   if(is.null(col))  
     col <- RColorBrewer::brewer.pal(10, "Paired") 
   else col=col
+  
   maxy=max(effect$Estimate+effect$Std.Err)
   miny=min(effect$Estimate-effect$Std.Err)
   
-  ggplot(effect,aes(x = species, y = Estimate, fill = group)) +
+  ggplot2::ggplot(effect,aes(x = species, y = Estimate, fill = group)) +
     geom_bar(position = position_dodge(0.6), stat="identity", width = 0.5)+
     scale_fill_manual(values=col)+
     guides(fill = guide_legend(reverse=F))+
@@ -49,11 +60,9 @@ plotsjSDMcoef = function(object,wrap_col,group=NULL,col=NULL) {
     coord_flip(expand=F) + 
     geom_hline(aes(yintercept = 0),linetype="dashed",size=1) +
     theme_classic()+ facet_wrap(~coef, ncol = wrap_col)+ 
-    geom_text(aes(y= miny-0.1, label = star), position = position_dodge(0.3), 
-              size = 2.5, fontface = "bold")+
+    geom_text(aes(y= miny-0.1, label =as.factor(star)), position = position_dodge(0.3), size = 2.5, fontface = "bold")+
     geom_errorbar(aes(ymax = Estimate + Std.Err, ymin = Estimate - Std.Err), width = 0.3)+ scale_y_continuous(limits = c(miny-0.3,maxy+0.1))
 }
-
 
 #' deg2rad
 #' degree to rad
