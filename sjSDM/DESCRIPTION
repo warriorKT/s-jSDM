@@ -29,7 +29,8 @@ Imports:
     tidyr,
     dplyr,
     magrittr,
-    ggplot2
+    ggplot2,
+    RColorBrewer
 Suggests:
     testthat,
     knitr,
